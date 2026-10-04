@@ -1,28 +1,33 @@
 package com.veterinaryclinic.controller;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.veterinaryclinic.dto.ClinicRequest;
 import com.veterinaryclinic.dto.ClinicResponse;
 import com.veterinaryclinic.dto.UserResponse;
 import com.veterinaryclinic.entity.Clinic;
 import com.veterinaryclinic.entity.User;
 import com.veterinaryclinic.service.ClinicService;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
 
 @RestController 
 @RequestMapping("/api/clinic-admin")
 @RequiredArgsConstructor 
 public class ClinicAdminController {
     private final ClinicService clinicService;
-
+    
     @GetMapping("/profile")
     public UserResponse profile(Authentication authentication) {
         User user = (User) authentication.getPrincipal();
-
         return new UserResponse(
             user.getId(),
             user.getFirstName(),
@@ -50,4 +55,13 @@ public class ClinicAdminController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
+    @GetMapping("/clinics")
+    public ResponseEntity<ClinicResponse> getMyClinics(Authentication authentication) {
+        User admin = (User) authentication.getPrincipal();
+        ClinicResponse response = clinicService.getMyClinic(admin);
+
+        return ResponseEntity.ok(response);
+    }
+
 }
